@@ -455,3 +455,10 @@ textarea::placeholder {
   transition: background-color 0.3s; /* Smooth transition */
 }
 
+
+.faded-hr {
+    border: none;
+    height: 0.5px;
+    background: linear-gradient(to right, transparent, #007f7f, transparent);
+
+}

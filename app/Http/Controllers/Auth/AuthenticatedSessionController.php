@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Display the user login view.
      */
     public function create(): View
     {
@@ -20,16 +20,41 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Handle an incoming authentication request for users.
      */
+    // public function store(LoginRequest $request): RedirectResponse
+    // {
+    //     $request->authenticate();
+
+    //     $request->session()->regenerate();
+
+    //     // Check if the user is a regular user and redirect them to welcome
+    //     if (Auth::user()->hasRole('User')) {
+    //         return redirect()->intended(route('welcome'));
+    //     }
+
+    //     // If the user is admin or superadmin, redirect to the dashboard
+    //     return redirect()->intended(route('dashboard'));
+    // }
+
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        // return redirect()->intended(route('dashboard', absolute: false));
-        return redirect()->intended(route('welcome', absolute: false));
+        // If the logged-in user is a regular User, redirect to the welcome page
+        if (Auth::user()->hasRole('User')) {
+            return redirect()->intended(route('welcome'));
+        }
+
+        // Admin or SuperAdmin should only access the dashboard
+        if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('SuperAdmin')) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // Fallback for other roles (if applicable)
+        Auth::logout();
+        return redirect()->route('login')->withErrors('Access denied.');
     }
 
     /**
